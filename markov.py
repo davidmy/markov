@@ -72,10 +72,11 @@ def generate():
 	return s
 
 def main():
-	global prefix_length, num_output
+	global prefix_length, num_output, markov
 	
 	i = 1
 	help = False
+	show_stats = False
 	while i < len(sys.argv):
 		arg = sys.argv[i]
 		i = i + 1
@@ -85,11 +86,13 @@ def main():
 		elif arg == '-p':
 			prefix_length = int(sys.argv[i])
 			i = i + 1
+		elif arg == '--stats':
+			show_stats = True
 		else: help = True
 
 	if help:
 		print \
-"""Usage: python markov.py [-p PREFIX_LENGTH] [-n NUM_OUTPUTS]
+'''Usage: python markov.py [-p PREFIX_LENGTH] [-n NUM_OUTPUTS]
 Generates a markov chain based on standard input.
 
 Options:
@@ -99,13 +102,18 @@ Options:
   
 Example:
 	cat story1.txt story2.txt | python markov.py -p 5 -n 10
-"""
+'''
 	else:
-
 		for line in sys.stdin:
 			learn(line)
 	
-		for i in range(num_output):
-			print generate()
+		if show_stats:
+			print 'Number of prefixes:', len(markov)
+			print 'Max num of postfixes:', max([len(markov[key]) for key in markov])
+			print 'Avg num of postfixes:', float(sum([len(markov[key]) for key in markov]))/len(markov)
+			pass
+		else:
+			for i in range(num_output):
+				print generate()
 
 main()
